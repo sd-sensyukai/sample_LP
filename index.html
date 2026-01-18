@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>足立セルフディフェンス | ミット空手・護身術</title>
+    <style>
+        :root {
+            --accent-yellow: #ffcc00; 
+            --bg-base: #ffffff;
+            --container-bg: #FFFFEE; /* 指定の背景色 */
+            --text-dark: #333;
+            --container-width: 950px;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.7;
+            color: var(--text-dark);
+            margin: 0; padding: 0;
+            background-color: var(--bg-base); /* 画面端は白 */
+        }
+
+
+        /* 2. ヒーローセクション */
+        .hero-full {
+            position: relative; width: 100%; height: 100vh;
+            overflow: hidden; background-color: #000;
+        }
+        .f-slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 1.5s ease-in-out;
+        }
+        .f-slide.active { opacity: 1; }
+        .hero-copy {
+			transition: opacity 1.0s ease-in-out; /* ふわっと消える設定 */
+			opacity: 1;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 10; text-align: center; color: white; width: 90%;
+        }
+        .hero-copy h1 { font-size: clamp(2rem, 8vw, 4.2rem); margin-bottom: 15px; /* ↓ここを追加 */
+    animation: colorChange 5s ease-in-out forwards;color: #ffffff;}
+	
+		/* 色の変化のルールを作る */
+		@keyframes colorChange {
+			0% {
+				color: #ffffff; /* 最初は白 */
+			}
+			100% {
+				color: #ff0000; /* 最後は赤 */
+			}
+		}
+        .hero-copy p {
+            font-size: 1.4rem; font-weight: bold; background: var(--accent-yellow);
+            color: #000; display: inline-block; padding: 8px 25px;
+        }
+		.hero-copy.hidden {
+			opacity: 0; /* 透明にする */
+		}
+		/* 3. このクラスがついている間だけ赤へ変化 */
+		.hero-copy h1.animate {
+			animation: colorChange 5s ease-in-out forwards;
+		}
+
+        /* --- 3. メインコンテナ (950px中央寄せ) --- */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 80px 40px;
+            background-color: var(--container-bg); /* ここが薄オレンジ */
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+
+        h2.section-title {
+            text-align: center; font-size: 2.2rem; margin-bottom: 60px;
+            position: relative; padding-bottom: 15px;
+        }
+        h2.section-title::after {
+            content: ""; position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%); width: 60px; height: 5px;
+            background: var(--accent-yellow);
+        }
+
+        /* --- レイヤーデザイン共通設定 (小項目) --- */
+        .layer-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            /* 下部に黄色のレイヤーを覗かせる */
+            box-shadow: 0px 8px 0px var(--accent-yellow);
+            transition: transform 0.2s;
+        }
+
+        /* 4. 特徴 (3列) */
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+            margin-bottom: 100px;
+        }
+        .feature-item { text-align: center; padding: 20px; }
+        .feature-item img {
+            width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;
+        }
+
+        /* 5. クラス内容 (スライダー) */
+        .slider-outer { position: relative; margin-bottom: 100px; padding: 20px 40px; }
+        .slider-inner { display: flex; transition: 0.5s ease; gap: 20px; }
+		/* スライダーの「中身」だけを隠す設定に変更 */
+		.slider-container {
+			overflow: hidden; /* カードがはみ出す分はここで隠す */
+			width: 100%;
+		}
+        .content-card {
+            flex: 0 0 calc(33.333% - 14px);
+            overflow: hidden;
+            /* スライダー内のカードもレイヤー化 */
+            background: #fff; border-radius: 12px; box-shadow: 0px 8px 0px var(--accent-yellow);
+        }
+        .content-card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-text { padding: 20px; }
+		
+		/* 画像の代わりに表示するボックス */
+		.image-placeholder {
+			width: 100%;
+			height: 180px;
+			min-height: 250px; /* ボックスの最低限の高さ */
+			background-color: #ddd; /* 薄いグレー */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #666;
+			font-size: 0.9rem;
+			font-weight: bold;
+			border-radius: 8px; /* 角を少し丸く */
+		}
+
+		/* スライダー内のカードなど、特定の場所の高さ調整 */
+		.content-card .image-placeholder {
+			height: 200px;
+		}
+
+        /* スライダーボタン */
+        .slider-btn {
+            position: absolute; 
+			top: 50%; 
+			transform: translateY(-50%);
+			background: var(--accent-yellow); 
+			border: 2px solid #000; /* 縁取りをつけると視認性が上がります */
+			width: 50px; 
+			height: 50px;
+			border-radius: 50%; 
+			cursor: pointer; 
+			z-index: 100; /* 絶対に一番上にくるように */
+			font-size: 1.2rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .prev-btn { left: -10px; } .next-btn { right: -10px; }
+
+        /* 6. 料金・FAQ・指導者 (個別レイヤー適用) */
+        .price-box {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 100px;
+        }
+        .price-item { padding: 30px; }
+        .price-list { list-style: none; padding: 0; margin: 0; }
+        .price-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dotted #ccc; }
+        
+        .faq-item { margin-bottom: 25px; padding: 20px; }
+        .instructor-card { display: flex; gap: 40px; align-items: center; padding: 40px; margin-bottom: 100px; }
+        .inst-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 4px solid var(--accent-yellow); }
+
+        /* 7. アクセス */
+        .map-layer { padding: 15px; }
+        .map-container { width: 100%; height: 400px; border-radius: 8px; overflow: hidden; }
+
+        .cta-center { text-align: center; margin: 60px 0 100px; }
+        .main-btn {
+            background-color: var(--accent-yellow); color: #000; padding: 25px 60px;
+            font-size: 1.6rem; font-weight: bold; text-decoration: none; border-radius: 60px;
+            display: inline-block; /* 初期状態の影：右下にクッキリ出す（レイヤーデザインに合わせる） */
+			box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.15);
+			
+			/* アニメーションの設定 */
+			transition: all 0.3s ease;
+			border: 2px solid #000; /* 境界をはっきりさせる */
+			position: relative;;
+		}
+		
+		/* マウスを合わせた時（ホバー）の動き */
+		.main-btn:hover {
+			transform: translateY(-5px); /* 上に5px持ち上がる */
+			box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.1); /* 影を大きく、少し薄くして浮遊感を出す */
+			background-color: #ffe066; /* 少し明るい黄色にして「押せる感」をアップ */
+		}
+
+		/* クリックした瞬間の動き（おまけ） */
+		.main-btn:active {
+			transform: translateY(2px); /* 押し込んだように少し下がる */
+			box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+		}
+
+        footer { background: #222; color: #fff; text-align: center; padding: 40px 0; }
+
+        @media (max-width: 768px) {
+            .feature-grid, .price-box, .instructor-card { grid-template-columns: 1fr; }
+            .content-card { flex: 0 0 100%; }
+            .instructor-card { flex-direction: column; text-align: center; }
+        }
+		
+		/* 責任者紹介のレイアウト */
+		.instructor-flex {
+			display: flex;
+			align-items: center;
+			gap: 40px;
+			padding: 40px 0;
+		}
+
+		/* 円形の仮置きボックス */
+		.instructor-placeholder {
+			width: 250px;  /* サイズは適宜調整してください */
+			height: 250px;
+			background-color: #ddd;
+			border-radius: 50%; /* これで正円になります */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			color: #666;
+			font-size: 0.9rem;
+			font-weight: bold;
+			flex-shrink: 0; /* 円が潰れないように固定 */
+		}
+
+		/* スマホ用の調整 */
+		@media (max-width: 768px) {
+			.instructor-flex {
+				flex-direction: column;
+				text-align: center;
+			}
+		}
+    </style>
+</head>
+<body>
+
+<section class="hero-full">
+    <div id="full-slider">
+        <div class="f-slide active" style="background-image: url('top1.png');"></div>
+        <div class="f-slide">
+			<video src="top2.mp4" muted autoplay loop playsinline 
+				   style="width: 100%; height: 100%; object-fit: cover;"></video>
+		</div>
+    </div>
+    <div class="hero-copy">
+        <h1>日常に、揺るぎない自信を</h1>
+        <p>足立セルフディフェンス：ミット空手教室</p>
+    </div>
+</section>
+
+<main class="container">
+
+    <div class="cta-center">
+        <a href="#contact" class="main-btn">まずは無料体験に申し込む</a>
+    </div>
+
+    <section id="features">
+        <h2 class="section-title">タイトル①</h2>
+        <div class="feature-grid">
+            <div class="feature-item layer-card">
+                <div class="image-placeholder">ここに画像が入ります</div>
+                <h3>項目1</h3>
+                <p>詳細についての説明文もこちらで作成できます！</p>
+            </div>
+            <div class="feature-item layer-card">
+                <div class="image-placeholder">ここに画像が入ります</div>
+                <h3>項目2</h3>
+                <p>また事前に詳細を送っていただければこちらで形を整えて載せることができます！</p>
+            </div>
+            <div class="feature-item layer-card">
+                <div class="image-placeholder">ここに画像が入ります</div>
+                <h3>項目3</h3>
+                <p>その他キャッチコピー等もこちらで提案できます！</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contents">
+        <h2 class="section-title">見本</h2>
+        <div class="slider-outer">
+            <button class="slider-btn prev-btn" onclick="moveSlide(-1)">❮</button>
+            <div class="slider-inner" id="classSlider">
+                <div class="content-card">
+                    <div class="image-placeholder">ここに画像が入ります</div>
+                    <div class="card-text"><h4>見本</h4><p>見本</p></div>
+                </div>
+                <div class="content-card">
+                    <div class="image-placeholder">ここに画像が入ります</div>
+                    <div class="card-text"><h4>見本</h4><p>見本</p></div>
+                </div>
+                <div class="content-card">
+                    <div class="image-placeholder">ここに画像が入ります</div>
+                    <div class="card-text"><h4>見本</h4><p>相見本</p></div>
+                </div>
+            </div>
+            <button class="slider-btn next-btn" onclick="moveSlide(1)">❯</button>
+        </div>
+    </section>
+
+    <section id="pricing">
+        <h2 class="section-title">料金体系</h2>
+        <div class="price-box">
+            <div class="price-item layer-card">
+                <h3>初期費用</h3>
+                <ul class="price-list">
+                    <li>入会金 <span>10,000円</span></li>
+                    <li>事務手数料 <span>3,000円</span></li>
+                </ul>
+            </div>
+            <div class="price-item layer-card">
+                <h3>月謝・参加費</h3>
+                <ul class="price-list">
+                    <li>月4回コース <span>8,000円</span></li>
+                    <li>都度払い（1回） <span>2,500円</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq">
+        <h2 class="section-title">よくある質問</h2>
+        <div class="faq-list">
+            <div class="faq-item layer-card">
+                <strong>Q. 全くの初心者ですが大丈夫ですか？</strong>
+                <p>A. もちろんです。参加者の多くが未経験からスタートしています。</p>
+            </div>
+            <div class="faq-item layer-card">
+                <strong>Q. 必要な持ち物はありますか？</strong>
+                <p>A. 動きやすい服装、飲み物、タオルをお持ちください。道着は不要です。</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="instructor">
+        <h2 class="section-title">指導者紹介</h2>
+        <div class="instructor-card layer-card">
+            <div class="instructor-placeholder">
+                ここに画像が入ります
+            </div>
+            <div class="inst-info">
+                <h3>○○（道場責任者）</h3>
+                <p>「楽しく、強く」をモットーに、丁寧な指導を行います。</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="access">
+        <h2 class="section-title">アクセス</h2>
+        <div class="map-layer layer-card">
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3236.5426711684795!2d139.75922157559674!3d35.786608772553386!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018931a48edffb9%3A0xc397b0d7e8bf90fb!2z6Laz56uL44K744Or44OV44OH44Kj44OV44Kn44Oz44K5!5e0!3m2!1sja!2sjp!4v1768704677932!5m2!1sja!2sjp" width=100% height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer><p>© 2025 足立セルフディフェンス All Rights Reserved.</p></footer>
+
+<script>
+    // ヒーロースライダー
+    const hSlides = document.querySelectorAll('.f-slide');
+    const hCopy = document.querySelector('.hero-copy');
+	const hTitle = hCopy.querySelector('h1');
+    let hIdx = 0;
+	
+	// 最初（読み込み時）に1枚目のアニメーションを開始
+	hTitle.classList.add('animate');
+
+    setInterval(() => {
+        if (hSlides.length < 2) return;
+
+        hSlides[hIdx].classList.remove('active');
+        hIdx = (hIdx + 1) % hSlides.length;
+        hSlides[hIdx].classList.add('active');
+        
+        if (hCopy) {
+            if (hIdx === 0) {
+                // 1枚目に戻った時：表示してアニメーションをリセット
+                hCopy.classList.remove('hidden');
+                
+                // --- ここからアニメーションのリセット処理 ---
+                hTitle.classList.remove('animate');
+                void hTitle.offsetWidth; // 魔法の一行：これでリセットが認識される
+                hTitle.classList.add('animate');
+                // --- ここまで ---
+                
+            } else {
+                // 2枚目（動画）の時：非表示にしてアニメーションクラスを外しておく
+                hCopy.classList.add('hidden');
+                hTitle.classList.remove('animate');
+            }
+        }
+    }, 5000);
+
+    // コンテンツスライダー
+    let cIdx = 0;
+    function moveSlide(dir) {
+        const slider = document.getElementById('classSlider');
+        const cards = document.querySelectorAll('.content-card');
+        if (!slider || cards.length === 0) return;
+
+        const gap = 20;
+        const cardWidth = cards[0].offsetWidth + gap;
+        const visibleCards = window.innerWidth > 768 ? 3 : 1;
+        const maxIdx = cards.length - visibleCards;
+        
+        cIdx += dir;
+        if (cIdx < 0) cIdx = 0;
+        if (cIdx > maxIdx) cIdx = maxIdx;
+        slider.style.transform = `translateX(${-cIdx * cardWidth}px)`;
+    }
+</script>
+
+</body>
+</html>
